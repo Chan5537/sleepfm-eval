@@ -1,11 +1,13 @@
 import { useReducer } from 'react'
+import { toast } from 'sonner'
 import { DEMO_CASES } from '@/data/demo-cases'
-import { rubricReducer, initialRubricState, pickCount } from '@/lib/reducer'
+import { rubricReducer, initialRubricState } from '@/lib/reducer'
 import { PatientContextPanel } from '@/components/PatientContextPanel'
 import { QueryBubble } from '@/components/QueryBubble'
 import { ResponsePair } from '@/components/ResponsePair'
 import { SideBySideRubric } from '@/components/SideBySideRubric'
 import { AbsoluteRubric } from '@/components/AbsoluteRubric'
+import { SubmitBar } from '@/components/SubmitBar'
 
 // Single-case demo. To show a different case, change the index here.
 const demoCase = DEMO_CASES[0]
@@ -13,8 +15,14 @@ const demoCase = DEMO_CASES[0]
 function App() {
   const [state, dispatch] = useReducer(rubricReducer, initialRubricState)
 
+  function handleSubmit() {
+    toast.success('Submitted ✓')
+    dispatch({ type: 'RESET' })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="flex min-h-screen flex-col bg-muted/30">
       <header className="border-b bg-background">
         <div className="mx-auto max-w-5xl px-4 py-4">
           <h1 className="text-lg font-semibold tracking-tight">Clinician Evaluation</h1>
@@ -24,7 +32,7 @@ function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl space-y-6 px-4 py-6">
+      <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-6">
         <PatientContextPanel
           demographics={demoCase.demographics}
           ehrHistory={demoCase.ehr_history}
@@ -36,10 +44,9 @@ function App() {
         />
         <SideBySideRubric state={state} dispatch={dispatch} />
         <AbsoluteRubric state={state} dispatch={dispatch} />
-
-        {/* M5 replaces this with the sticky SubmitBar. */}
-        <p className="text-sm text-muted-foreground">{pickCount(state)} / 11 picks</p>
       </main>
+
+      <SubmitBar state={state} onSubmit={handleSubmit} />
     </div>
   )
 }
