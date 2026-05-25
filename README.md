@@ -1,73 +1,70 @@
-# React + TypeScript + Vite
+# SleepFM v2 — Clinician Evaluation Interface (frontend mockup)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A polished, single-page demo of the clinician evaluation task for the SleepFM v2
+agentic-evaluation framework (UCLA Health Intelligence Lab). A clinician sees one
+patient case, the patient's question, and two source-blinded responses (A and B),
+then completes an 11-pick rubric and submits. This iteration is a **frontend-only
+mockup** — no backend, no persistence, no auth — intended as a recruitment artifact
+and the visual prototype of the eventual labeling tool.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+React 19 · Vite · TypeScript · Tailwind CSS v4 · shadcn/ui · react-markdown +
+remark-gfm · sonner. State is a single `useReducer`; there is no router and no
+network access.
 
-## React Compiler
+## Local development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build    # type-check + production build to dist/
+npm run preview  # serve the production build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+> Node 20.19+ or 22.12+ is recommended (Vite prints a warning on older 20.x but
+> still builds). If `npm run build` fails with a Rolldown
+> `Cannot find module './rolldown-binding.*.node'` error, install your platform's
+> native binary explicitly, e.g. `npm i -D @rolldown/binding-darwin-arm64@<rolldown-version>`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## The rubric
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Side-by-side preference (3 axes, A or B):** Comprehensiveness, Trustworthiness,
+  Specificity. No "Tie" option.
+- **Absolute accuracy (4 axes × both responses = 8 Yes/No):** Factuality,
+  Reference & Interpretation, Safety, Grounding.
+
+Submit is disabled until all 11 picks are made. Per-axis notes are optional.
+Submitting shows a confirmation toast and resets the form (no data is stored).
+
+## Updating the demo case
+
+Edit [`src/data/demo-cases.ts`](src/data/demo-cases.ts). `App.tsx` renders
+`DEMO_CASES[0]`; point it at a different index to show another case. To flip which
+response shows as A vs B, swap `response_left`/`response_right` and the
+`left_is_agent` flag — no code change. Rubric axis labels and help text live in
+[`src/lib/rubric-config.ts`](src/lib/rubric-config.ts).
+
+## Blinding — do not regress
+
+The UI must never reveal which response is which arm, nor the agent's internals.
+Before deploying, confirm the production bundle is clean:
+
+```bash
+npm run build
+# All of these must print 0:
+grep -oF -e Agent -e "Base LLM" -e GPT -e Gemini -e SleepFM -e ReAct dist/assets/*.js | wc -l
+grep -oE '\btool\b' dist/assets/*.js | wc -l
+grep -oF 'visualizations' dist/assets/*.js | wc -l   # Comprehensiveness help must not say this
 ```
+
+Demo response content lives only in `src/data/demo-cases.ts`; keep all source
+labels out of it.
+
+## Deploy (Vercel)
+
+1. Push this `app/` directory to a GitHub repo.
+2. On vercel.com, import the repo. Vercel auto-detects the Vite preset
+   (build `npm run build`, output `dist/`). No `vercel.json` is needed — there is
+   no client-side router.
+3. Deploys run automatically on push to the default branch; share the resulting URL.
