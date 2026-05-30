@@ -1,7 +1,17 @@
-import { useReducer } from 'react'
+import { useReducer, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { DEMO_CASES } from '@/data/demo-cases'
-import { rubricReducer, initialRubricState } from '@/lib/reducer'
+import {
+  sessionReducer,
+  initialSessionState,
+  allCasesSubmitted,
+} from '@/lib/session'
+import type { SessionState, SessionAction } from '@/lib/session'
+import type { RubricAction } from '@/lib/types'
+import { load, save, clear } from '@/lib/storage'
+import { LandingScreen } from '@/components/LandingScreen'
+import { CompletionScreen } from '@/components/CompletionScreen'
+import { ProgressIndicator } from '@/components/ProgressIndicator'
 import { PatientContextPanel } from '@/components/PatientContextPanel'
 import { QueryBubble } from '@/components/QueryBubble'
 import { ResponsePair } from '@/components/ResponsePair'
@@ -9,26 +19,106 @@ import { SideBySideRubric } from '@/components/SideBySideRubric'
 import { AbsoluteRubric } from '@/components/AbsoluteRubric'
 import { SubmitBar } from '@/components/SubmitBar'
 
-// Single-case demo. To show a different case, change the index here.
-const demoCase = DEMO_CASES[0]
+// Lazy initializer: hydrate from localStorage exactly once at render-init.
+// (StrictMode double-invokes effects but not the useReducer init, so this is
+// the safe place to read storage.)
+function initSession(): SessionState {
+  return load() ?? initialSessionState()
+}
 
 function App() {
-  const [state, dispatch] = useReducer(rubricReducer, initialRubricState)
+  const [session, dispatch] = useReducer(sessionReducer, undefined, initSession)
+  const debounceRef = useRef<number | null>(null)
+
+  // Debounced persist; coalesces note keystrokes.
+  useEffect(() => {
+    if (debounceRef.current) window.clearTimeout(debounceRef.current)
+    debounceRef.current = window.setTimeout(() => save(session), 300)
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current)
+    }
+  }, [session])
+
+  // Synchronous write that cancels the pending debounce — used on Submit so a
+  // navigation can never drop the just-committed picks.
+  const flush = (next: SessionState) => {
+    if (debounceRef.current) window.clearTimeout(debounceRef.current)
+    save(next)
+  }
+
+  if (session.view === 'landing') {
+    return (
+      <LandingScreen
+        reviewer={session.reviewer}
+        onReviewerChange={(r) => dispatch({ type: 'SET_REVIEWER', reviewer: r })}
+        onBegin={() => dispatch({ type: 'BEGIN' })}
+      />
+    )
+  }
+
+  if (session.view === 'completion') {
+    return (
+      <CompletionScreen
+        session={session}
+        cases={DEMO_CASES}
+        onReview={(i) => dispatch({ type: 'GOTO_CASE', caseIndex: i })}
+        onResetAll={() => {
+          clear()
+          dispatch({ type: 'RESET_ALL' })
+        }}
+      />
+    )
+  }
+
+  const i = session.currentCaseIndex
+  const demoCase = DEMO_CASES[i]
+  const caseRubric = session.cases[i]
+
+  // Adapter: forward the flat RubricAction into the session reducer, so the
+  // rubric components keep their existing Dispatch<RubricAction> prop type.
+  const caseDispatch = (action: RubricAction) =>
+    dispatch({ type: 'RUBRIC', caseIndex: i, action })
 
   function handleSubmit() {
+    const at = new Date().toISOString()
+    const durationSeconds =
+      session.caseEnteredAt != null
+        ? Math.round((Date.now() - session.caseEnteredAt) / 1000)
+        : null
+    const submitAction: SessionAction = {
+      type: 'SUBMIT_CASE',
+      caseIndex: i,
+      at,
+      durationSeconds,
+    }
+    const afterSubmit = sessionReducer(session, submitAction)
+    const navAction: SessionAction = allCasesSubmitted(afterSubmit)
+      ? { type: 'FINISH' }
+      : { type: 'NEXT_CASE' }
+    const next = sessionReducer(afterSubmit, navAction)
+    dispatch(submitAction)
+    dispatch(navAction)
+    flush(next) // persist the post-nav state synchronously
     toast.success('Submitted ✓')
-    dispatch({ type: 'RESET' })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
     <div className="flex min-h-screen flex-col bg-muted/30">
       <header className="border-b bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-4">
-          <h1 className="text-lg font-semibold tracking-tight">Clinician Evaluation</h1>
-          <p className="text-sm text-muted-foreground">
-            Review the conversation below and complete the rubric.
-          </p>
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">Clinician Evaluation</h1>
+            <p className="text-sm text-muted-foreground">
+              Review the conversation below and complete the rubric.
+            </p>
+          </div>
+          <ProgressIndicator
+            current={i}
+            total={DEMO_CASES.length}
+            submitted={session.cases.map((c) => c.submitted)}
+            onGoto={(idx) => dispatch({ type: 'GOTO_CASE', caseIndex: idx })}
+          />
         </div>
       </header>
 
@@ -42,11 +132,11 @@ function App() {
           responseLeft={demoCase.response_left}
           responseRight={demoCase.response_right}
         />
-        <SideBySideRubric state={state} dispatch={dispatch} />
-        <AbsoluteRubric state={state} dispatch={dispatch} />
+        <SideBySideRubric state={caseRubric.state} dispatch={caseDispatch} />
+        <AbsoluteRubric state={caseRubric.state} dispatch={caseDispatch} />
       </main>
 
-      <SubmitBar state={state} onSubmit={handleSubmit} />
+      <SubmitBar state={caseRubric.state} onSubmit={handleSubmit} />
     </div>
   )
 }
