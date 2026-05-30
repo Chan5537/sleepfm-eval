@@ -9,6 +9,7 @@ import {
 import type { SessionState, SessionAction } from '@/lib/session'
 import type { RubricAction } from '@/lib/types'
 import { load, save, clear } from '@/lib/storage'
+import { Button } from '@/components/ui/button'
 import { LandingScreen } from '@/components/LandingScreen'
 import { CompletionScreen } from '@/components/CompletionScreen'
 import { ProgressIndicator } from '@/components/ProgressIndicator'
@@ -112,19 +113,39 @@ function App() {
             <img
               src={`${import.meta.env.BASE_URL}ucla_logo.jpg`}
               alt="UCLA"
-              className="h-8 w-auto object-contain"
+              className="h-9 w-auto rounded-sm object-contain"
             />
             <div>
               <h1 className="text-lg font-semibold tracking-tight">Clinician Evaluation</h1>
               <p className="text-xs text-muted-foreground">UCLA Health Intelligence Lab</p>
             </div>
           </div>
-          <ProgressIndicator
-            current={i}
-            total={DEMO_CASES.length}
-            submitted={session.cases.map((c) => c.submitted)}
-            onGoto={(idx) => dispatch({ type: 'GOTO_CASE', caseIndex: idx })}
-          />
+          <div className="flex items-center gap-3">
+            <ProgressIndicator
+              current={i}
+              total={DEMO_CASES.length}
+              submitted={session.cases.map((c) => c.submitted)}
+              onGoto={(idx) => dispatch({ type: 'GOTO_CASE', caseIndex: idx })}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    'Start over? This clears all your answers for every pair.',
+                  )
+                ) {
+                  clear()
+                  dispatch({ type: 'RESET_ALL' })
+                }
+              }}
+            >
+              Start over
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -145,7 +166,13 @@ function App() {
         <AbsoluteRubric state={caseRubric.state} dispatch={caseDispatch} />
       </main>
 
-      <SubmitBar state={caseRubric.state} onSubmit={handleSubmit} />
+      <SubmitBar
+        state={caseRubric.state}
+        onSubmit={handleSubmit}
+        onBack={() => dispatch({ type: 'GOTO_CASE', caseIndex: i - 1 })}
+        canGoBack={i > 0}
+        isLast={i === DEMO_CASES.length - 1}
+      />
       <AppFooter />
     </div>
   )

@@ -1,6 +1,7 @@
 import type { Dispatch } from 'react'
 import { Button } from '@/components/ui/button'
 import { RubricRow } from '@/components/RubricRow'
+import { RubricRefLink } from '@/components/RubricRefLink'
 import { SIDE_BY_SIDE_AXES } from '@/lib/rubric-config'
 import type { RubricState, RubricAction, RubricPick, SideBySideAxisKey } from '@/lib/types'
 
@@ -52,16 +53,19 @@ export function SideBySideRubric({ state, dispatch }: Props) {
             Which response is better on each axis?
           </p>
         </div>
-        <span
-          className={
-            'shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ' +
-            (chosen === total
-              ? 'bg-primary/10 text-primary'
-              : 'bg-muted text-muted-foreground')
-          }
-        >
-          {chosen} of {total} chosen
-        </span>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <span
+            className={
+              'rounded-full px-2 py-0.5 text-xs font-medium ' +
+              (chosen === total
+                ? 'bg-primary/10 text-primary'
+                : 'bg-muted text-muted-foreground')
+            }
+          >
+            {chosen} of {total} chosen
+          </span>
+          <RubricRefLink />
+        </div>
       </div>
       <div className="divide-y">
         {SIDE_BY_SIDE_AXES.map((axis) => {

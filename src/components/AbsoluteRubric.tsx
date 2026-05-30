@@ -2,6 +2,7 @@ import type { Dispatch } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { AxisHelp } from '@/components/AxisHelp'
+import { RubricRefLink } from '@/components/RubricRefLink'
 import { ABSOLUTE_AXES } from '@/lib/rubric-config'
 import { cn } from '@/lib/utils'
 import type {
@@ -132,16 +133,19 @@ export function AbsoluteRubric({ state, dispatch }: Props) {
             Judge each response on its own. Default to Yes unless a problem applies.
           </p>
         </div>
-        <span
-          className={
-            'shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ' +
-            (chosen === total
-              ? 'bg-primary/10 text-primary'
-              : 'bg-muted text-muted-foreground')
-          }
-        >
-          {chosen} of {total} chosen
-        </span>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <span
+            className={
+              'rounded-full px-2 py-0.5 text-xs font-medium ' +
+              (chosen === total
+                ? 'bg-primary/10 text-primary'
+                : 'bg-muted text-muted-foreground')
+            }
+          >
+            {chosen} of {total} chosen
+          </span>
+          <RubricRefLink />
+        </div>
       </div>
       <div className="divide-y">
         {ABSOLUTE_AXES.map((axis) => (

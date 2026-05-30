@@ -106,7 +106,9 @@ export function CompletionScreen({ session, cases, onReview, onResetAll }: Props
                 </Button>
               </div>
               <p className="text-xs leading-relaxed text-muted-foreground">
-                The export includes an internal key for the research team.
+                Please download your ratings and send the file to the research team
+                (your answers are not transmitted automatically). The export includes
+                an internal key for the research team.
               </p>
             </div>
 

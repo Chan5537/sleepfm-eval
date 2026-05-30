@@ -1,3 +1,4 @@
+import { ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -5,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { LogoLockup } from '@/components/LogoLockup'
 import { AppFooter } from '@/components/AppFooter'
 import { SIDE_BY_SIDE_AXES, ABSOLUTE_AXES } from '@/lib/rubric-config'
+import { GUIDELINE_DOC_URL, RUBRIC_DOC_URL } from '@/lib/links'
 import { DEMO_CASES } from '@/data/demo-cases'
 
 interface Props {
@@ -29,11 +31,11 @@ export function LandingScreen({ reviewer, onReviewerChange, onBegin }: Props) {
                 Clinician Evaluation Study
               </h1>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Thank you for taking part. You will review <strong>{total}
-                query–response pairs</strong>. For each, you will see a case
-                summary, a clinical query, and <strong>two responses (Response A and
-                Response B)</strong>. You will not be told which system produced each
-                response.
+                Thank you for taking part. You will review{' '}
+                <strong>{total} query–response pairs</strong>. For each, you will see
+                a case summary, a clinical query, and <strong>two responses (Response
+                A and Response B)</strong>. You will not be told which system produced
+                each response.
               </p>
             </div>
 
@@ -67,6 +69,30 @@ export function LandingScreen({ reviewer, onReviewerChange, onBegin }: Props) {
                   ))}
                 </ul>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Reference materials
+              </p>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button asChild variant="outline" className="flex-1 justify-between">
+                  <a href={GUIDELINE_DOC_URL} target="_blank" rel="noopener noreferrer">
+                    Evaluation guideline
+                    <ExternalLink className="size-4" />
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className="flex-1 justify-between">
+                  <a href={RUBRIC_DOC_URL} target="_blank" rel="noopener noreferrer">
+                    Scoring rubric
+                    <ExternalLink className="size-4" />
+                  </a>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                These open in a new tab; you can also reach the rubric from each
+                section during the evaluation.
+              </p>
             </div>
 
             <div className="space-y-2">
