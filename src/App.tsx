@@ -12,7 +12,7 @@ import { load, save, clear } from '@/lib/storage'
 import { LandingScreen } from '@/components/LandingScreen'
 import { CompletionScreen } from '@/components/CompletionScreen'
 import { ProgressIndicator } from '@/components/ProgressIndicator'
-import { PatientContextPanel } from '@/components/PatientContextPanel'
+import { CaseContextPanel } from '@/components/CaseContextPanel'
 import { QueryBubble } from '@/components/QueryBubble'
 import { ResponsePair } from '@/components/ResponsePair'
 import { SideBySideRubric } from '@/components/SideBySideRubric'
@@ -123,7 +123,7 @@ function App() {
       </header>
 
       <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-6">
-        <PatientContextPanel
+        <CaseContextPanel
           demographics={demoCase.demographics}
           ehrHistory={demoCase.ehr_history}
         />

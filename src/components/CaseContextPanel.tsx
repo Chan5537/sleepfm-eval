@@ -23,21 +23,21 @@ function DemographicItem({ label, value }: { label: string; value: string }) {
   )
 }
 
-// Collapsible reference panel, expanded by default. Shows what the clinician
-// is allowed to see about the patient — demographics + coded EHR history.
-// Deliberately holds no PSG signal or sleep-derived metrics.
-export function PatientContextPanel({ demographics, ehrHistory }: Props) {
+// Collapsible reference panel, expanded by default. Shows the case background the
+// clinician is allowed to see — demographics + coded EHR history. Deliberately
+// holds no PSG signal or sleep-derived metrics.
+export function CaseContextPanel({ demographics, ehrHistory }: Props) {
   const { age, sex, bmi, race } = demographics
   return (
     <Accordion
       type="single"
       collapsible
-      defaultValue="patient-context"
+      defaultValue="case-context"
       className="rounded-lg border bg-card px-4"
     >
-      <AccordionItem value="patient-context" className="border-none">
+      <AccordionItem value="case-context" className="border-none">
         <AccordionTrigger className="text-sm font-semibold">
-          Patient context
+          Case context
         </AccordionTrigger>
         <AccordionContent className="space-y-4 pb-4">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

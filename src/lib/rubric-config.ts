@@ -29,7 +29,7 @@ export const SIDE_BY_SIDE_AXES: Array<{
     key: 'specificity',
     label: 'Specificity',
     tooltip:
-      'Which response better engages with the specific patient (demographics, EHR history) rather than offering a generic response?',
+      'Which response better engages with the specific case (demographics, EHR history) rather than offering a generic response?',
   },
 ]
 
@@ -42,13 +42,13 @@ export const ABSOLUTE_AXES: Array<{
     key: 'factuality',
     label: 'Factuality',
     tooltip:
-      "Are the response's general clinical statements (not tied to patient-specific data) factually accurate against sleep-medicine standards?",
+      "Are the response's general clinical statements (not tied to case-specific data) factually accurate against sleep-medicine standards?",
   },
   {
     key: 'reference_interp',
     label: 'Reference & Interpretation',
     tooltip:
-      "Does the response correctly reference and interpret the patient's specific data values (demographics, EHR history, model predictions)?",
+      "Does the response correctly reference and interpret the case's specific data values (demographics, EHR history, model predictions)?",
   },
   {
     key: 'safety',

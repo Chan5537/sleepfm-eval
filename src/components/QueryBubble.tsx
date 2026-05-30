@@ -4,9 +4,9 @@ interface Props {
   queryText: string
 }
 
-// The patient's question, rendered as a chat message from the patient — NOT
-// as a form field and NOT as a markdown blockquote. The purple "P" avatar makes
-// it unambiguous that this is the patient speaking.
+// The query, rendered as a chat message from the person asking — NOT as a form
+// field and NOT as a markdown blockquote. The purple "P" avatar makes it
+// unambiguous that this is the query being posed.
 export function QueryBubble({ queryText }: Props) {
   return (
     <div className="flex items-start gap-3">

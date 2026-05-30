@@ -27,9 +27,9 @@ export function LandingScreen({ reviewer, onReviewerChange, onBegin }: Props) {
               </h1>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 Thank you for taking part. You will review <strong>{total} synthetic
-                patient cases</strong>. For each, you will see a patient summary, a
-                clinical question, and <strong>two responses (Response A and Response
-                B)</strong>. You will not be told which system produced each response.
+                cases</strong>. For each, you will see a case summary, a clinical
+                query, and <strong>two responses (Response A and Response B)</strong>.
+                You will not be told which system produced each response.
               </p>
             </div>
 
@@ -78,7 +78,7 @@ export function LandingScreen({ reviewer, onReviewerChange, onBegin }: Props) {
             </div>
 
             <p className="text-xs leading-relaxed text-muted-foreground">
-              All patient data is synthetic. Your progress is saved in this browser,
+              All case data is synthetic. Your progress is saved in this browser,
               so you can close the page and resume later.
             </p>
 

@@ -1,9 +1,10 @@
 import type { DemoCase } from '@/lib/types'
 
-// Hand-authored demo data. App.tsx renders DEMO_CASES[0] only.
+// Hand-authored demo data. App cycles through every entry in DEMO_CASES.
 //
-// CONTENT IS PLACEHOLDER (clinically plausible) — replace response_left /
-// response_right with the canonical worked_example_onepager.pdf text before deploy.
+// CONTENT IS SYNTHETIC but clinically plausible (made-up cases, real guideline
+// citations). Edit freely; if you change case content or count, bump
+// SCHEMA_VERSION in src/lib/session.ts so stale saved progress is discarded.
 //
 // SOURCE-BLINDING RULE: response_left / response_right must never contain the
 // strings Agent, Base, GPT, Gemini, SleepFM, tool, or ReAct. The A/B assignment
@@ -42,7 +43,7 @@ Given your background, the factors most relevant to you are likely your blood pr
 
 If you have any symptoms such as palpitations, an irregular pulse, shortness of breath, or lightheadedness, you should bring them to your doctor's attention so they can decide whether further testing is warranted.`
 
-// --- Case 1 (HSP_synth_002): generic vs. patient-specific, cited side is B ---
+// --- Case 1 (HSP_synth_002): generic vs. case-specific, cited side is B ---
 
 const HSP_002_GENERIC = `Everyone's long-term health risk depends on a mix of factors, and some general patterns apply broadly.
 
@@ -71,7 +72,7 @@ const HSP_002_SPECIFIC = `Looking at your specific profile, your most pressing l
 [^1]: Arnett DK, et al. 2019 ACC/AHA Guideline on the Primary Prevention of Cardiovascular Disease. *Circulation.* 2021.
 [^2]: American Diabetes Association. Standards of Care in Diabetes — 2024. *Diabetes Care.* 2024.`
 
-// --- Case 2 (HSP_synth_003): patient-specific vs. generic, cited side is A ---
+// --- Case 2 (HSP_synth_003): case-specific vs. generic, cited side is A ---
 
 const HSP_003_SPECIFIC = `Based on your diagnoses and sleep findings, here are the conditions that most warrant attention over the next several years, along with concrete steps that can reduce each risk.
 

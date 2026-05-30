@@ -2,7 +2,7 @@
 
 A polished, single-page demo of the clinician evaluation task for the SleepFM v2
 agentic-evaluation framework (UCLA Health Intelligence Lab). A clinician sees one
-patient case, the patient's question, and two source-blinded responses (A and B),
+case, a clinical query, and two source-blinded responses (A and B),
 then completes an 11-pick rubric and submits. This iteration is a **frontend-only
 mockup** — no backend, no persistence, no auth — intended as a recruitment artifact
 and the visual prototype of the eventual labeling tool.

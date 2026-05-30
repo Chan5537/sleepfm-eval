@@ -103,7 +103,7 @@ export function CompletionScreen({ session, cases, onReview, onResetAll }: Props
                 </Button>
               </div>
               <p className="text-xs leading-relaxed text-muted-foreground">
-                The export includes an internal key for the research team; all patient
+                The export includes an internal key for the research team; all case
                 data is synthetic.
               </p>
             </div>
