@@ -116,13 +116,32 @@ function ResponseCell({
 // Applying both arms keeps the clinician blinded and yields a baseline-vs-other
 // absolute comparison.
 export function AbsoluteRubric({ state, dispatch }: Props) {
+  const slots: ResponseSlot[] = ['a', 'b']
+  const total = ABSOLUTE_AXES.length * slots.length
+  const chosen = ABSOLUTE_AXES.reduce(
+    (n, axis) =>
+      n + slots.filter((slot) => state[pickKey(slot, axis.key)] !== null).length,
+    0,
+  )
   return (
     <section className="rounded-lg border bg-card px-4">
-      <div className="border-b py-3">
-        <h2 className="text-sm font-semibold">Absolute accuracy</h2>
-        <p className="text-xs text-muted-foreground">
-          Judge each response on its own. Default to Yes unless a problem applies.
-        </p>
+      <div className="flex items-start justify-between gap-3 border-b py-3">
+        <div>
+          <h2 className="text-sm font-semibold">Absolute accuracy</h2>
+          <p className="text-xs text-muted-foreground">
+            Judge each response on its own. Default to Yes unless a problem applies.
+          </p>
+        </div>
+        <span
+          className={
+            'shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ' +
+            (chosen === total
+              ? 'bg-primary/10 text-primary'
+              : 'bg-muted text-muted-foreground')
+          }
+        >
+          {chosen} of {total} chosen
+        </span>
       </div>
       <div className="divide-y">
         {ABSOLUTE_AXES.map((axis) => (

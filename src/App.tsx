@@ -12,6 +12,7 @@ import { load, save, clear } from '@/lib/storage'
 import { LandingScreen } from '@/components/LandingScreen'
 import { CompletionScreen } from '@/components/CompletionScreen'
 import { ProgressIndicator } from '@/components/ProgressIndicator'
+import { AppFooter } from '@/components/AppFooter'
 import { CaseContextPanel } from '@/components/CaseContextPanel'
 import { QueryBubble } from '@/components/QueryBubble'
 import { ResponsePair } from '@/components/ResponsePair'
@@ -107,11 +108,16 @@ function App() {
     <div className="flex min-h-screen flex-col bg-muted/30">
       <header className="border-b bg-background">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight">Clinician Evaluation</h1>
-            <p className="text-sm text-muted-foreground">
-              Review the conversation below and complete the rubric.
-            </p>
+          <div className="flex items-center gap-3">
+            <img
+              src={`${import.meta.env.BASE_URL}ucla_logo.jpg`}
+              alt="UCLA"
+              className="h-8 w-auto object-contain"
+            />
+            <div>
+              <h1 className="text-lg font-semibold tracking-tight">Clinician Evaluation</h1>
+              <p className="text-xs text-muted-foreground">UCLA Health Intelligence Lab</p>
+            </div>
           </div>
           <ProgressIndicator
             current={i}
@@ -122,7 +128,10 @@ function App() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-6">
+      <main
+        key={i}
+        className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-6 animate-in fade-in duration-300"
+      >
         <CaseContextPanel
           demographics={demoCase.demographics}
           ehrHistory={demoCase.ehr_history}
@@ -137,6 +146,7 @@ function App() {
       </main>
 
       <SubmitBar state={caseRubric.state} onSubmit={handleSubmit} />
+      <AppFooter />
     </div>
   )
 }

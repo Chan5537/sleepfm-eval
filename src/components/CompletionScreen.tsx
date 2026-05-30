@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Download, Pencil } from 'lucide-react'
+import { LogoLockup } from '@/components/LogoLockup'
+import { AppFooter } from '@/components/AppFooter'
 import type { SessionState } from '@/lib/session'
 import type { DemoCase } from '@/lib/types'
 import { pickCount } from '@/lib/reducer'
@@ -27,13 +29,14 @@ export function CompletionScreen({ session, cases, onReview, onResetAll }: Props
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-4 py-10">
         <Card>
           <CardContent className="space-y-6 p-6 sm:p-8">
+            <LogoLockup />
             <div className="space-y-2">
               <h1 className="text-xl font-semibold tracking-tight">
                 Evaluation complete — thank you!
               </h1>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                You have reviewed all {cases.length} cases. You can download your
-                ratings, review or edit any case, or start over.
+                You have reviewed all {cases.length} pairs. You can download your
+                ratings, review or edit any pair, or start over.
               </p>
             </div>
 
@@ -48,7 +51,7 @@ export function CompletionScreen({ session, cases, onReview, onResetAll }: Props
                 return (
                   <li key={cases[i].case_id} className="flex items-center justify-between gap-3 px-4 py-3">
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">Case {i + 1}</span>
+                      <span className="text-sm font-medium">Pair {i + 1}</span>
                       <span className="text-xs text-muted-foreground">{cases[i].case_id}</span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -103,8 +106,7 @@ export function CompletionScreen({ session, cases, onReview, onResetAll }: Props
                 </Button>
               </div>
               <p className="text-xs leading-relaxed text-muted-foreground">
-                The export includes an internal key for the research team; all case
-                data is synthetic.
+                The export includes an internal key for the research team.
               </p>
             </div>
 
@@ -116,6 +118,7 @@ export function CompletionScreen({ session, cases, onReview, onResetAll }: Props
           </CardContent>
         </Card>
       </main>
+      <AppFooter />
     </div>
   )
 }

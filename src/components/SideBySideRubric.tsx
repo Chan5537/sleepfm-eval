@@ -41,13 +41,27 @@ function ChoiceButton({
 // Three side-by-side preference axes. Each is an A-or-B pick (no Tie, per
 // rubric v2).
 export function SideBySideRubric({ state, dispatch }: Props) {
+  const chosen = SIDE_BY_SIDE_AXES.filter((a) => state[a.key] !== null).length
+  const total = SIDE_BY_SIDE_AXES.length
   return (
     <section className="rounded-lg border bg-card px-4">
-      <div className="border-b py-3">
-        <h2 className="text-sm font-semibold">Side-by-side preference</h2>
-        <p className="text-xs text-muted-foreground">
-          Which response is better on each axis?
-        </p>
+      <div className="flex items-start justify-between gap-3 border-b py-3">
+        <div>
+          <h2 className="text-sm font-semibold">Side-by-side preference</h2>
+          <p className="text-xs text-muted-foreground">
+            Which response is better on each axis?
+          </p>
+        </div>
+        <span
+          className={
+            'shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ' +
+            (chosen === total
+              ? 'bg-primary/10 text-primary'
+              : 'bg-muted text-muted-foreground')
+          }
+        >
+          {chosen} of {total} chosen
+        </span>
       </div>
       <div className="divide-y">
         {SIDE_BY_SIDE_AXES.map((axis) => {

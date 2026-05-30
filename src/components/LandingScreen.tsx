@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
+import { LogoLockup } from '@/components/LogoLockup'
+import { AppFooter } from '@/components/AppFooter'
 import { SIDE_BY_SIDE_AXES, ABSOLUTE_AXES } from '@/lib/rubric-config'
 import { DEMO_CASES } from '@/data/demo-cases'
 
@@ -21,21 +23,23 @@ export function LandingScreen({ reviewer, onReviewerChange, onBegin }: Props) {
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-4 py-10">
         <Card>
           <CardContent className="space-y-6 p-6 sm:p-8">
+            <LogoLockup />
             <div className="space-y-2">
               <h1 className="text-xl font-semibold tracking-tight">
                 Clinician Evaluation Study
               </h1>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Thank you for taking part. You will review <strong>{total} synthetic
-                cases</strong>. For each, you will see a case summary, a clinical
-                query, and <strong>two responses (Response A and Response B)</strong>.
-                You will not be told which system produced each response.
+                Thank you for taking part. You will review <strong>{total}
+                query–response pairs</strong>. For each, you will see a case
+                summary, a clinical query, and <strong>two responses (Response A and
+                Response B)</strong>. You will not be told which system produced each
+                response.
               </p>
             </div>
 
             <div className="space-y-2">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                On each case you will record a side-by-side preference on three axes
+                For each pair you will record a side-by-side preference on three axes
                 and an absolute Yes/No judgment of each response on four accuracy
                 axes — <strong>11 selections in total</strong>. Optional comments are
                 welcome. The whole study takes about <strong>10–15 minutes</strong>.
@@ -78,8 +82,8 @@ export function LandingScreen({ reviewer, onReviewerChange, onBegin }: Props) {
             </div>
 
             <p className="text-xs leading-relaxed text-muted-foreground">
-              All case data is synthetic. Your progress is saved in this browser,
-              so you can close the page and resume later.
+              Your progress is saved in this browser, so you can close the page and
+              resume later.
             </p>
 
             <Button size="lg" className="w-full sm:w-auto" onClick={onBegin}>
@@ -88,6 +92,7 @@ export function LandingScreen({ reviewer, onReviewerChange, onBegin }: Props) {
           </CardContent>
         </Card>
       </main>
+      <AppFooter />
     </div>
   )
 }
