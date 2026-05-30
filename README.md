@@ -35,36 +35,86 @@ npm run preview  # serve the production build
   Reference & Interpretation, Safety, Grounding.
 
 Submit is disabled until all 11 picks are made. Per-axis notes are optional.
-Submitting shows a confirmation toast and resets the form (no data is stored).
 
-## Updating the demo case
+## Flow & data
 
-Edit [`src/data/demo-cases.ts`](src/data/demo-cases.ts). `App.tsx` renders
-`DEMO_CASES[0]`; point it at a different index to show another case. To flip which
-response shows as A vs B, swap `response_left`/`response_right` and the
-`left_is_agent` flag — no code change. Rubric axis labels and help text live in
+A landing screen → **3 cases** in sequence (with a "Case n of 3" progress
+indicator) → a completion screen with **Download JSON / Download CSV** buttons.
+There is no backend: progress is saved in the browser's `localStorage`
+(`sleepfm-eval-v1`), so a clinician can close the page and resume from the first
+unsubmitted case. The CSV/JSON columns mirror the lab's `reviews` schema (one row
+per case, including the internal `a_is_agent` un-blinding key used only by the
+research team). All state lives in:
+
+- [`src/lib/session.ts`](src/lib/session.ts) — multi-case session reducer.
+- [`src/lib/storage.ts`](src/lib/storage.ts) — versioned, fault-tolerant localStorage.
+- [`src/lib/export.ts`](src/lib/export.ts) — JSON/CSV builders (RFC-4180 + BOM).
+
+## Updating the demo cases
+
+Edit [`src/data/demo-cases.ts`](src/data/demo-cases.ts) — `DEMO_CASES` drives every
+case in the cycle. To flip which response shows as A vs B, swap
+`response_left`/`response_right` and the `left_is_agent` flag. If you change case
+**content or count**, bump `SCHEMA_VERSION` in `src/lib/session.ts` so stale saved
+progress is discarded. Rubric axis labels and help text live in
 [`src/lib/rubric-config.ts`](src/lib/rubric-config.ts).
 
 ## Blinding — do not regress
 
 The UI must never reveal which response is which arm, nor the agent's internals.
-Before deploying, confirm the production bundle is clean:
+Before deploying, confirm the built artifact + content are clean (word-boundary,
+case-sensitive — the `\b` excludes the `tool` inside `tooltip`; lowercase
+`react`/`sleepfm` are import identifiers, not visible copy):
 
 ```bash
 npm run build
-# All of these must print 0:
-grep -oF -e Agent -e "Base LLM" -e GPT -e Gemini -e SleepFM -e ReAct dist/assets/*.js | wc -l
-grep -oE '\btool\b' dist/assets/*.js | wc -l
-grep -oF 'visualizations' dist/assets/*.js | wc -l   # Comprehensiveness help must not say this
+# The shipped bundle is the real gate — expect 0 (comments in src/ that document
+# the rule are stripped from the build, so audit dist/, not src/):
+grep -roE '\b(Agent|Base LLM|GPT|Gemini|SleepFM|ReAct|tool)\b' dist/assets/   # Expect 0
+grep -ro 'visualizations' dist/assets/                                        # Expect 0
+grep -ro 'If no citations are present, select Yes.' dist/assets/              # Expect present
 ```
 
 Demo response content lives only in `src/data/demo-cases.ts`; keep all source
 labels out of it.
 
-## Deploy (Vercel)
+## Deploying to GitHub Pages
 
-1. Push this `app/` directory to a GitHub repo.
-2. On vercel.com, import the repo. Vercel auto-detects the Vite preset
-   (build `npm run build`, output `dist/`). No `vercel.json` is needed — there is
-   no client-side router.
-3. Deploys run automatically on push to the default branch; share the resulting URL.
+Static, backend-free. CI builds and publishes to Pages via
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+
+### Base path
+
+The site is served at `https://<user>.github.io/<repo-name>/`, so Vite's `base`
+must be `'/<repo-name>/'`, read from `VITE_BASE` at build time (default
+`'/sleepfm-eval/'`). CI sets it in the workflow:
+
+```yaml
+env:
+  VITE_BASE: /sleepfm-eval/   # both slashes; must equal the exact repo name
+```
+
+### One-time setup
+
+1. Pick a repo name; it must match `VITE_BASE` (default repo: `sleepfm-eval`).
+2. From this `app/` directory: `gh repo create <user>/sleepfm-eval --public --source . --remote origin`.
+3. `git push -u origin main`.
+4. **Settings → Pages → Build and deployment → Source = "GitHub Actions"** (the one un-scriptable click).
+5. The workflow runs on push; the deploy job summary shows the live URL.
+
+### Local preview of the production base
+
+```bash
+VITE_BASE=/sleepfm-eval/ npm run build && npm run preview
+# open http://localhost:4173/sleepfm-eval/
+```
+
+### Blank page after deploy?
+
+White page + Console 404s for `/<repo>/assets/index-*.js` means `VITE_BASE` ≠ the
+repo name. Fix: set it to exactly `/<repo>/` (both slashes, exact case) and re-run.
+
+### Runtime asset rule
+
+Never hardcode a leading-slash asset/href in TSX; use an ESM `import` or
+`import.meta.env.BASE_URL`, or the path breaks under the Pages base.
